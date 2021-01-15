@@ -106,7 +106,8 @@ func (queue *Queue) Remove() (makeless_go_queue.Node, error) {
 	result, err := queue.getClient().ReceiveMessage(&sqs.ReceiveMessageInput{
 		QueueUrl:            queue.getQueueUrl(),
 		MaxNumberOfMessages: aws.Int64(1),
-		VisibilityTimeout:   aws.Int64(60),
+		VisibilityTimeout:   aws.Int64(0),
+		WaitTimeSeconds:     aws.Int64(1),
 	})
 
 	if err != nil {
