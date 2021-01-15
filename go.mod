@@ -2,7 +2,7 @@ module github.com/makeless/makeless-go-queue-amazon-sqs
 
 go 1.15
 
-replace github.com/makeless/makeless-go => /Users/lucasloffel/go/src/github.com/makeless/makeless-go
+// replace github.com/makeless/makeless-go => /Users/lucasloffel/go/src/github.com/makeless/makeless-go
 
 require (
 	github.com/aws/aws-sdk-go v1.36.27
