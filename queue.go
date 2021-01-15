@@ -113,6 +113,10 @@ func (queue *Queue) Remove() (makeless_go_queue.Node, error) {
 		return nil, err
 	}
 
+	if len(result.Messages) == 0 {
+		return nil, nil
+	}
+
 	return &makeless_go_queue_basic.Node{
 		Data:    []byte(*result.Messages[0].Body),
 		RWMutex: new(sync.RWMutex),
