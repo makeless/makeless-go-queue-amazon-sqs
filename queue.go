@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/makeless/makeless-go/queue"
-	"github.com/makeless/makeless-go/queue/basic"
 	"sync"
 )
 
@@ -106,7 +105,6 @@ func (queue *Queue) Remove() (makeless_go_queue.Node, error) {
 	result, err := queue.getClient().ReceiveMessage(&sqs.ReceiveMessageInput{
 		QueueUrl:            queue.getQueueUrl(),
 		MaxNumberOfMessages: aws.Int64(1),
-		VisibilityTimeout:   aws.Int64(0),
 		WaitTimeSeconds:     aws.Int64(1),
 	})
 
@@ -118,12 +116,23 @@ func (queue *Queue) Remove() (makeless_go_queue.Node, error) {
 		return nil, nil
 	}
 
-	return &makeless_go_queue_basic.Node{
-		Data:    []byte(*result.Messages[0].Body),
-		RWMutex: new(sync.RWMutex),
+	return &Node{
+		Data:          []byte(*result.Messages[0].Body),
+		ReceiptHandle: *result.Messages[0].ReceiptHandle,
+		RWMutex:       new(sync.RWMutex),
 	}, nil
 }
 
 func (queue *Queue) Empty() (bool, error) {
 	return false, fmt.Errorf("method empty not implemented yet")
+}
+
+func (queue *Queue) Delete(node *Node) error {
+	var receiptHandle = node.GetReceiptHandle()
+	_, err := queue.getClient().DeleteMessage(&sqs.DeleteMessageInput{
+		QueueUrl:      queue.getQueueUrl(),
+		ReceiptHandle: &receiptHandle,
+	})
+
+	return err
 }
