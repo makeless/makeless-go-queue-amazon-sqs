@@ -13,18 +13,26 @@ import (
 
 type Queue struct {
 	Context context.Context
-	Queue   *string
+	Queue   string
+	Config  aws.Config
 
 	client   *sqs.SQS
 	queueUrl *string
 	*sync.RWMutex
 }
 
-func (queue *Queue) GetQueue() *string {
+func (queue *Queue) GetQueue() string {
 	queue.RLock()
 	defer queue.RUnlock()
 
 	return queue.Queue
+}
+
+func (queue *Queue) GetConfig() aws.Config {
+	queue.RLock()
+	defer queue.RUnlock()
+
+	return queue.Config
 }
 
 func (queue *Queue) getClient() *sqs.SQS {
@@ -57,13 +65,14 @@ func (queue *Queue) setQueueUrl(queueUrl *string) {
 
 func (queue *Queue) Init() error {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
+		Config: queue.GetConfig(),
 	}))
 
 	client := sqs.New(sess)
 
+	name := queue.GetQueue()
 	result, err := client.GetQueueUrl(&sqs.GetQueueUrlInput{
-		QueueName: queue.GetQueue(),
+		QueueName: &name,
 	})
 
 	if err != nil {
