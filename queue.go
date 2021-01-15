@@ -124,7 +124,7 @@ func (queue *Queue) Remove() (makeless_go_queue.Node, error) {
 }
 
 func (queue *Queue) Empty() (bool, error) {
-	return false, fmt.Errorf("method empty not implemented yet")
+	return false, fmt.Errorf("empty not supported by aws sqs")
 }
 
 func (queue *Queue) Delete(node *Node) error {
